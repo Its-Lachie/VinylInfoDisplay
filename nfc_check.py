@@ -17,7 +17,7 @@ if __name__ == '__main__':
         while tagChecking:
             # Check if a card is available to read
             uid = pn532.read_passive_target(timeout=0.5)
-            print('.')
+            print(' ')
             # Try again if no card is available.
             if uid is None:
                 continue
