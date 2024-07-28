@@ -3,6 +3,8 @@ import RPi.GPIO as GPIO
 from pn532 import *
 import sqlite3
 
+debug = True
+
 def database_check(hexVal):
     conn = sqlite3.connect('database/collection.db')
     
@@ -61,12 +63,14 @@ if __name__ == '__main__':
             if uid is None:
                 continue
             else:
-                print('Base UID: ', uid)
-                print('Found card with UID:', [hex(i) for i in uid])
                 hexValList = [hex(i) for i in uid]
                 hexVal = "-".join(hexValList)
-                print('hexValList: ', hexValList)
-                print('hexVal: ', hexVal)
+                
+                if debug:
+                    print('Base UID: ', uid)
+                    print('Found card with UID:', [hex(i) for i in uid])
+                    print('hexValList: ', hexValList)
+                    print('hexVal: ', hexVal)
                 
                 database_check(hexVal)
                 tagChecking = False
