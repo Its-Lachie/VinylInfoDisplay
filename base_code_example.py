@@ -31,7 +31,11 @@ if __name__ == '__main__':
             # Try again if no card is available.
             if uid is None:
                 continue
+            print('Base UID: ', uid, [i for i in uid])
             print('Found card with UID:', [hex(i) for i in uid])
+            hexVal = [hex(i) for i in uid]
+            print('hexVal: ', hexVal)
+            print('hexVal as joined string: ', "-".join(hexVal))
            
     except Exception as e:
         print(e)
