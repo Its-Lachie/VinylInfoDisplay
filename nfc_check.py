@@ -1,6 +1,7 @@
 # This is where the NFC reader code will run
 import RPi.GPIO as GPIO
 from pn532 import *
+from fractions import Fraction
 import sqlite3
 #import tkinter as tk
 
@@ -31,7 +32,11 @@ def database_check(hexVal):
             print("Runtime: ", f'{h:d}:{m:02d}:{s:02d}')
             print("Number of Discs: ", record_info[3])
             print("Disc Size: ", str(record_info[4])+'"')
-            print("Speed: ", record_info[5], "RPM")
+            i, d = divmod(record_info[5], 1)
+            if record_info[5] == 33.33:
+                print("Speed: ", str(int(i))+" 1/3 RPM")
+            else:
+                print("Speed: ", record_info[5], "RPM", d)
             print("Notes: ", record_info[6])
             print(" ")
             print("Tracks:")
