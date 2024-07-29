@@ -2,15 +2,22 @@
 import RPi.GPIO as GPIO
 from pn532 import *
 import sqlite3
+#import tkinter as tk
 
 debug = True
 
 def database_check(hexVal):
+    # To implement: GUI interface
+    #window = tk.Tk()
+    #text_box = tk.Text()
+    #text_box.pack()
+    
     conn = sqlite3.connect('database/collection.db')
     
     idCheck = conn.execute("SELECT uuid FROM idCheck WHERE nfcID = ?", (hexVal,)) 
     for idChecked in idCheck:
         uuid = idChecked[0]
+        #text_box.insert("1.0", "UUID: "+uuid)
         print("UUID: ", uuid)
         print("----------------")
         
@@ -43,39 +50,45 @@ def database_check(hexVal):
         
     conn.close()
 
-if __name__ == '__main__':
-    try:        
-        pn532 = PN532_UART(debug=False, reset=20)
+def scanner():
+    while True:
+        try:        
+            pn532 = PN532_UART(debug=False, reset=20)
 
-        ic, ver, rev, support = pn532.get_firmware_version()
-        print('Found PN532 with firmware version: {0}.{1}'.format(ver, rev))
+            ic, ver, rev, support = pn532.get_firmware_version()
+            print('Found PN532 with firmware version: {0}.{1}'.format(ver, rev))
 
-        # Configure PN532 to communicate with MiFare cards
-        pn532.SAM_configuration()
+            # Configure PN532 to communicate with MiFare cards
+            pn532.SAM_configuration()
 
-        print('Waiting for RFID/NFC tag...')
-        tagChecking = True
-        while tagChecking:
-            # Check if a card is available to read
-            uid = pn532.read_passive_target(timeout=0.5)
-            print(' ')
-            # Try again if no card is available.
-            if uid is None:
-                continue
-            else:
-                hexValList = [hex(i) for i in uid]
-                hexVal = "-".join(hexValList)
-                
-                if debug:
-                    print('Base UID: ', uid)
-                    print('Found card with UID:', [hex(i) for i in uid])
-                    print('hexValList: ', hexValList)
-                    print('hexVal: ', hexVal)
-                
-                database_check(hexVal)
-                tagChecking = False
-           
-    except Exception as e:
-        print(e)
-    finally:
-        GPIO.cleanup()
+            print('Waiting for RFID/NFC tag...')
+            tagChecking = True
+            while tagChecking:
+                # Check if a card is available to read
+                uid = pn532.read_passive_target(timeout=0.5)
+                print(' ')
+                # Try again if no card is available.
+                if uid is None:
+                    continue
+                else:
+                    hexValList = [hex(i) for i in uid]
+                    hexVal = "-".join(hexValList)
+                    
+                    if debug:
+                        print('Base UID: ', uid)
+                        print('Found card with UID:', [hex(i) for i in uid])
+                        print('hexValList: ', hexValList)
+                        print('hexVal: ', hexVal)
+                    
+                    database_check(hexVal)
+                    tagChecking = False
+               
+        except Exception as e:
+            print(e)
+            continue
+        finally:
+            GPIO.cleanup()
+        break
+
+if __name__ == '__main__':    
+    scanner()
