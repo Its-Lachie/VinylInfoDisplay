@@ -21,7 +21,8 @@ def database_check(hexVal):
         print("UUID: ", uuid)
         print("----------------")
         
-        record = conn.execute("SELECT title, artist, runtime, number_of_discs, disc_size FROM collection WHERE uuid = ?", (uuid,))
+        # Record Info
+        record = conn.execute("SELECT title, artist, runtime, number_of_discs, disc_size, speed, notes FROM collection WHERE uuid = ?", (uuid,))
         for record_info in record:
             print("Title: ", record_info[0])
             print("Artist: ", record_info[1])
@@ -30,19 +31,24 @@ def database_check(hexVal):
             print("Runtime: ", f'{h:d}:{m:02d}:{s:02d}')
             print("Number of Discs: ", record_info[3])
             print("Disc Size: ", str(record_info[4])+'"')
+            print("Speed: ", record_info[5], "RPM")
+            print("Notes: ", record_info[6])
             print(" ")
             print("Tracks:")
 
-        # TO DO: ADD TRACK NUMBER COLUMN
+        # Tracklist
         tracklist = conn.execute("SELECT trackid, title, track_length, side_of_record FROM tracks WHERE uuid = ?", (uuid,))
         for track in tracklist:
             trackid = track[0]
             print("Track ID: ", trackid)
             print("Song Name: ", track[1])
             print("Song Artists: ")
-            song_artists = conn.execute("SELECT artist from track_artist WHERE trackID = ?", (trackid,))
+            song_artists = conn.execute("SELECT artist, featured from track_artist WHERE trackID = ?", (trackid,))
             for artist in song_artists:
-                print("   ", artist[0])
+                if artist[1] == "Y":
+                    print("    ft.", artist[0])
+                else:
+                    print("   ", artist[0])
             m, s = divmod(track[2], 60)
             print("Track Length: ",f'{m:02d}:{s:02d}')
             print("Side of Record: ", track[3])
