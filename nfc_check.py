@@ -17,7 +17,7 @@ def database_check(hexVal):
     
     idCheck = conn.execute("SELECT uuid FROM idCheck WHERE nfcID = ?", (hexVal,)) 
     for idChecked in idCheck:
-        uuid = '84dffd65-9ccc-4cfa-af0e-2d6560b2fc4d' #idChecked[0]
+        uuid = idChecked[0]
         #text_box.insert("1.0", "UUID: "+uuid)
         print("UUID: ", uuid)
         print("----------------")
@@ -69,10 +69,14 @@ def database_check(hexVal):
             print("Track Number: ", track[1])
             print("Song Name: ", track[2])
             print("Song Artists: ")
-            song_artists = conn.execute("SELECT artist, featured from track_artist WHERE trackID = ?", (trackid,))
+            song_artists = conn.execute("SELECT artist, main, featured, remixer from track_artist WHERE trackID = ?", (trackid,))
             for artist in song_artists:
-                if artist[1] == "Y":
+                if artist[2] == "Y":
                     print("    ft.", artist[0])
+                elif artist[3] == "Y":
+                    if artist[1] == "Y":
+                        print("   ", artist[0])
+                    print("Remixed by:", artist[0])
                 else:
                     print("   ", artist[0])
             m, s = divmod(track[3], 60)
