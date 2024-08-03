@@ -23,13 +23,7 @@ def database_check(hexVal):
         
         # Genres
         genres = conn.execute("SELECT genre_name, subgenre FROM genres WHERE uuid = ?", (uuid,))
-        for genre_info in genres:
-            if genre_info[1] == "Y":
-                print("   Subgenre: ", genre_info[0])
-            else:
-                print("Genre: ", genre_info[0])
-            
-        print("-------------------------------")
+        record_genres = list(genres)
         print("Tracks:")
         print("")
 
@@ -65,4 +59,4 @@ def database_check(hexVal):
             print("Side of Record: ", track[4])
             
     conn.close()
-    return uuid, record_list
+    return uuid, record_list, record_genres
