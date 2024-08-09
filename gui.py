@@ -9,15 +9,10 @@ root.geometry('1920x1080')
 
 def frame_gen(root):
     frame = Frame(root)
-    frame.grid_rowconfigure(5, minsize=50)
-    frame.grid_rowconfigure(9, minsize=50)
-    frame.pack(side="top", expand=True, fill="both")
+    frame.pack(side="top", fill="both")
     return frame
 
 def label_gen(frame):
-    lbl = Label(frame, text = "Click to scan NFC")
-    lbl.grid(column = 0, row = 0)
-
     #Album labels
     lbl2 = Label(frame, text = "")
     lbl2.grid(column = 0, row = 1)
@@ -75,10 +70,12 @@ def label_gen(frame):
     lblTrackHeader = Label(frame, text = "")
     lblTrackHeader.grid(column = 0, row = 10)
     
-    return lbl, lbl2, lblAlbumInfo, lblTitleHeader, lblArtistHeader, lblRuntimeHeader, lblNoOfDiscsHeader, lblDiscSizeHeader, lblSpeedHeader, lblNotesHeader, lblTitle, lblArtist, lblRuntime, lblNoOfDiscs, lblDiscSize, lblSpeed, lblNotes, lblGenreTitle, column, lblTrackHeader
+    return lbl2, lblAlbumInfo, lblTitleHeader, lblArtistHeader, lblRuntimeHeader, lblNoOfDiscsHeader, lblDiscSizeHeader, lblSpeedHeader, lblNotesHeader, lblTitle, lblArtist, lblRuntime, lblNoOfDiscs, lblDiscSize, lblSpeed, lblNotes, lblGenreTitle, column, lblTrackHeader
 
 def clicked(frame):
-    lbl, lbl2, lblAlbumInfo, lblTitleHeader, lblArtistHeader, lblRuntimeHeader, lblNoOfDiscsHeader, lblDiscSizeHeader, lblSpeedHeader, lblNotesHeader, lblTitle, lblArtist, lblRuntime, lblNoOfDiscs, lblDiscSize, lblSpeed, lblNotes, lblGenreTitle, column, lblTrackHeader = label_gen(frame)
+    frame.grid_rowconfigure(5, minsize=50)
+    frame.grid_rowconfigure(9, minsize=50)
+    lbl2, lblAlbumInfo, lblTitleHeader, lblArtistHeader, lblRuntimeHeader, lblNoOfDiscsHeader, lblDiscSizeHeader, lblSpeedHeader, lblNotesHeader, lblTitle, lblArtist, lblRuntime, lblNoOfDiscs, lblDiscSize, lblSpeed, lblNotes, lblGenreTitle, column, lblTrackHeader = label_gen(frame)
     frame.pack()
     
     uuid, record, genres, tracks = scanner()
@@ -150,37 +147,32 @@ def clear(frame):
     for widget in frame.winfo_children():
        widget.destroy()
     
-    # button widget with red color text inside
-    btn = Button(frame, text = "Scan" ,
-             fg = "red", command=lambda:clicked(frame))
-    # Set Button Grid
-    btn.grid(column=3, row=0)
-    
-    # button widget with red color text inside
-    btnClear = Button(frame, text = "Clear" ,
-                 fg = "red", command=lambda:clear(frame))
-    # Set Button Grid
-    btnClear.grid(column=4, row=0)
-    
-    lbl, lbl2, lblAlbumInfo, lblTitleHeader, lblArtistHeader, lblRuntimeHeader, lblNoOfDiscsHeader, lblDiscSizeHeader, lblSpeedHeader, lblNotesHeader, lblTitle, lblArtist, lblRuntime, lblNoOfDiscs, lblDiscSize, lblSpeed, lblNotes, lblGenreTitle, column, lblTrackHeader = label_gen(frame)
+    frame = frame_gen(root)
+    lbl2, lblAlbumInfo, lblTitleHeader, lblArtistHeader, lblRuntimeHeader, lblNoOfDiscsHeader, lblDiscSizeHeader, lblSpeedHeader, lblNotesHeader, lblTitle, lblArtist, lblRuntime, lblNoOfDiscs, lblDiscSize, lblSpeed, lblNotes, lblGenreTitle, column, lblTrackHeader = label_gen(frame)
     frame.pack()
 
-
-frame = frame_gen(root)
-lbl, lbl2, lblAlbumInfo, lblTitleHeader, lblArtistHeader, lblRuntimeHeader, lblNoOfDiscsHeader, lblDiscSizeHeader, lblSpeedHeader, lblNotesHeader, lblTitle, lblArtist, lblRuntime, lblNoOfDiscs, lblDiscSize, lblSpeed, lblNotes, lblGenreTitle, column, lblTrackHeader = label_gen(frame)
+root_frame = frame_gen(root)
+lbl = Label(root_frame, text = "Click to scan NFC")
+lbl.grid(column = 0, row = 0)
 
 # button widget with red color text inside
-btnClear = Button(frame, text = "Clear" ,
+btnClear = Button(root_frame, text = "Clear" ,
              fg = "red", command=lambda:clear(frame))
 # Set Button Grid
 btnClear.grid(column=4, row=0)
  
 # button widget with red color text inside
-btn = Button(frame, text = "Scan" ,
+btn = Button(root_frame, text = "Scan" ,
              fg = "red", command=lambda:clicked(frame))
 # Set Button Grid
 btn.grid(column=3, row=0)
 
+
+
+frame = frame_gen(root)
+lbl2, lblAlbumInfo, lblTitleHeader, lblArtistHeader, lblRuntimeHeader, lblNoOfDiscsHeader, lblDiscSizeHeader, lblSpeedHeader, lblNotesHeader, lblTitle, lblArtist, lblRuntime, lblNoOfDiscs, lblDiscSize, lblSpeed, lblNotes, lblGenreTitle, column, lblTrackHeader = label_gen(frame)
 frame.pack()
+
+
 # Execute Tkinter
 root.mainloop()
