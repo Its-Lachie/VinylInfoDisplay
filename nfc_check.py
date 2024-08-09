@@ -35,7 +35,7 @@ def scanner():
                         print('hexValList: ', hexValList)
                         print('hexVal: ', hexVal)
                     
-                    uuid, record, genres = database_check(hexVal)
+                    uuid, record, genres, tracks = database_check(hexVal)
                     tagChecking = False
                
         except Exception as e:
@@ -44,4 +44,4 @@ def scanner():
         finally:
             GPIO.cleanup()
         break
-    return uuid, record, genres
+    return uuid, record, genres, tracks
