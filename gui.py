@@ -1,15 +1,18 @@
 from tkinter import *
+from tkinter.scrolledtext import ScrolledText
 from nfc_check import scanner
-from db_connect import song_artist
+from db_connect import song_artist, collection_list
 
 root = Tk()
 
 root.title("VinylInfoDisplay")
-root.geometry('1920x1080')
+root.geometry('1750x900')
 
-def frame_gen(root):
-    frame = Frame(root)
-    frame.pack(side="top", fill="both")
+text = ScrolledText(root, state='disable')
+text.pack(side = "bottom", fill='both', expand=True)
+
+def frame_gen(obj):
+    frame = Frame(obj)
     return frame
 
 def label_gen(frame):
@@ -72,11 +75,15 @@ def label_gen(frame):
     
     return lbl2, lblAlbumInfo, lblTitleHeader, lblArtistHeader, lblRuntimeHeader, lblNoOfDiscsHeader, lblDiscSizeHeader, lblSpeedHeader, lblNotesHeader, lblTitle, lblArtist, lblRuntime, lblNoOfDiscs, lblDiscSize, lblSpeed, lblNotes, lblGenreTitle, column, lblTrackHeader
 
-def clicked(frame):
+def scan(root):
+    global frame
+    frame = frame_gen(text)
+    text.window_create('1.0', window=frame)
     frame.grid_rowconfigure(5, minsize=50)
     frame.grid_rowconfigure(9, minsize=50)
     lbl2, lblAlbumInfo, lblTitleHeader, lblArtistHeader, lblRuntimeHeader, lblNoOfDiscsHeader, lblDiscSizeHeader, lblSpeedHeader, lblNotesHeader, lblTitle, lblArtist, lblRuntime, lblNoOfDiscs, lblDiscSize, lblSpeed, lblNotes, lblGenreTitle, column, lblTrackHeader = label_gen(frame)
-    frame.pack()
+    
+    btnClear.config(command=lambda:clear(frame))
     
     uuid, record, genres, tracks = scanner()
     #lbl2.configure(text = "UUID: " + uuid)
@@ -142,36 +149,57 @@ def clicked(frame):
             else:
                 column.append(Label(frame, text = t))
                 column[i].grid(column = i, row = index + 11)
-
-def clear(frame):
-    for widget in frame.winfo_children():
-       widget.destroy()
+                
+def show_collection(root):
+    global collection_frame
+    collection_frame = frame_gen(text)
+    text.window_create('1.0', window=collection_frame)
     
-    frame = frame_gen(root)
-    lbl2, lblAlbumInfo, lblTitleHeader, lblArtistHeader, lblRuntimeHeader, lblNoOfDiscsHeader, lblDiscSizeHeader, lblSpeedHeader, lblNotesHeader, lblTitle, lblArtist, lblRuntime, lblNoOfDiscs, lblDiscSize, lblSpeed, lblNotes, lblGenreTitle, column, lblTrackHeader = label_gen(frame)
-    frame.pack()
+    btnClear.configure(command=lambda:clear(collection_frame))
+    collection = collection_list()
+    for index, item in enumerate(collection):
+        column = []
+        for i, t in enumerate(collection[index]):
+            if i == 3:
+                if t:    
+                    m, s = divmod(t, 60)
+                    h, m = divmod(m, 60)
+                    column.append(Label(collection_frame, text = f'{h:d}:{m:02d}:{s:02d}'))
+                    column[i].grid(column = i, row = index, padx = 10)
+                else:
+                    column.append(Label(collection_frame, text = '------'))
+                    column[i].grid(column = i, row = index, padx = 10)
+            else:
+                column.append(Label(collection_frame, text = t))
+                column[i].grid(column = i, row = index, padx = 10)
+
+def clear(frame_name):
+    for widget in frame_name.winfo_children():
+       widget.destroy()
+       
+       frame_name.destroy()
+
 
 root_frame = frame_gen(root)
-lbl = Label(root_frame, text = "Click to scan NFC")
-lbl.grid(column = 0, row = 0)
+root_frame.pack(side="top", fill="both")
 
 # button widget with red color text inside
 btnClear = Button(root_frame, text = "Clear" ,
-             fg = "red", command=lambda:clear(frame))
+             fg = "red")
 # Set Button Grid
-btnClear.grid(column=4, row=0)
+btnClear.grid(column=2, row=0)
  
 # button widget with red color text inside
 btn = Button(root_frame, text = "Scan" ,
-             fg = "red", command=lambda:clicked(frame))
+             fg = "red", command=lambda:scan(root))
 # Set Button Grid
-btn.grid(column=3, row=0)
+btn.grid(column=0, row=0)
 
-
-
-frame = frame_gen(root)
-lbl2, lblAlbumInfo, lblTitleHeader, lblArtistHeader, lblRuntimeHeader, lblNoOfDiscsHeader, lblDiscSizeHeader, lblSpeedHeader, lblNotesHeader, lblTitle, lblArtist, lblRuntime, lblNoOfDiscs, lblDiscSize, lblSpeed, lblNotes, lblGenreTitle, column, lblTrackHeader = label_gen(frame)
-frame.pack()
+# button widget with red color text inside
+btn = Button(root_frame, text = "Collection" ,
+             fg = "red", command=lambda:show_collection(root))
+# Set Button Grid
+btn.grid(column=1, row=0)
 
 
 # Execute Tkinter

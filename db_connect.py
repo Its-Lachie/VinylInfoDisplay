@@ -40,3 +40,9 @@ def song_artist(trackID):
     song_artists = conn.execute("SELECT artist, main, featured, remixer from track_artist WHERE trackID = ?", (trackID,))
     artists = list(song_artists)
     return artists
+
+def collection_list():
+    conn = connection_init()
+    collection = conn.execute("SELECT * from collection")
+    collectionList = list(collection)
+    return collectionList
