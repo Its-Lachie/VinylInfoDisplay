@@ -6,7 +6,7 @@ from db_connect import song_artist, collection_list
 root = Tk()
 
 root.title("VinylInfoDisplay")
-root.geometry('1750x900')
+root.geometry('1900x900')
 
 text = ScrolledText(root, state='disable')
 text.pack(side = "bottom", fill='both', expand=True)
@@ -155,6 +155,8 @@ def show_collection(root):
     collection_frame = frame_gen(text)
     text.window_create('1.0', window=collection_frame)
     
+    uuid_list = []
+    
     btnClear.configure(command=lambda:clear(collection_frame))
     collection = collection_list()
     for index, item in enumerate(collection):
@@ -164,14 +166,21 @@ def show_collection(root):
                 if t:    
                     m, s = divmod(t, 60)
                     h, m = divmod(m, 60)
-                    column.append(Label(collection_frame, text = f'{h:d}:{m:02d}:{s:02d}'))
-                    column[i].grid(column = i, row = index, padx = 10)
+                    data_string = StringVar()
+                    data_string.set(f'{h:d}:{m:02d}:{s:02d}')
+                    column.append(Entry(collection_frame, textvariable=data_string, bd = 0, state="readonly", width = len(f'{h:d}:{m:02d}:{s:02d}')))
+                    column[i].grid(column = i, row = index, padx = 5, sticky='ew')
                 else:
-                    column.append(Label(collection_frame, text = '------'))
-                    column[i].grid(column = i, row = index, padx = 10)
+                    data_string = StringVar()
+                    data_string.set('------')
+                    column.append(Entry(collection_frame, textvariable=data_string, bd = 0, state="readonly", width = len('------')))
+                    column[i].grid(column = i, row = index, padx = 5, sticky='ew')
             else:
-                column.append(Label(collection_frame, text = t))
-                column[i].grid(column = i, row = index, padx = 10)
+                data_string = StringVar()
+                data_string.set(t)
+                column.append(Entry(collection_frame, textvariable=data_string, bd = 0, state="readonly", width = len(str(t))))
+                column[i].grid(column = i, row = index, padx = 5, sticky='ew')
+        
 
 def clear(frame_name):
     for widget in frame_name.winfo_children():
