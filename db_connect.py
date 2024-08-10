@@ -6,18 +6,11 @@ def connection_init():
     return conn
 
 def database_check(hexVal):
-    # To implement: GUI interface
-    #window = tk.Tk()
-    #text_box = tk.Text()
-    #text_box.pack()
-    
     conn = connection_init()
     
     idCheck = conn.execute("SELECT uuid FROM idCheck WHERE nfcID = ?", (hexVal,)) 
     for idChecked in idCheck:
         uuid = idChecked[0]
-        #text_box.insert("1.0", "UUID: "+uuid)
-        print("UUID: ", uuid)
         
         # Record Info
         record = conn.execute("SELECT title, artist, runtime, number_of_discs, disc_size, speed, notes FROM collection WHERE uuid = ?", (uuid,))
