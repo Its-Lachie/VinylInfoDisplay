@@ -1,7 +1,8 @@
 from tkinter import *
 from tkinter.scrolledtext import ScrolledText
 from nfc_check import scanner
-from db_connect import song_artist, collection_list
+from db_connect import song_artist, collection_list, check_uuid
+import uuid
 
 root = Tk()
 
@@ -80,12 +81,12 @@ def scan(root):
     btnShowColl.config(command='')
     btnScan.config(command=lambda:rescan(frame, root))
     
-    uuid, record, genres, tracks = scanner()
+    uuid_found, record, genres, tracks = scanner()
     
     lblUUIDHeader.configure(text = "UUID: ")
     data_string = StringVar()
-    data_string.set(uuid)
-    uuid_entry = Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(uuid))
+    data_string.set(uuid_found)
+    uuid_entry = Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(uuid_found))
     uuid_entry.grid(column = 1, row = 1, pady = (5, 5))
     
     for index, record_info in enumerate(record):
@@ -218,9 +219,26 @@ def add_to_collection():
     btnScan.config(command='')
     btnShowColl.config(command='')
     
+    btnGenUUID = Button(add_collection_frame, text = "Generate UUID" ,
+             fg = "red", command=generate_uuid)
+    btnGenUUID.grid(column=2, row=1, padx = 10)
+    
+    
 def rescan(frame_name, root):
     clear(frame_name)
     scan(root)
+
+def generate_uuid():
+    isInCollection = True
+    while isInCollection:
+        gen_uuid = uuid.uuid4()
+        isInCollection = check_uuid(str(gen_uuid))
+        
+    data_string = StringVar()
+    data_string.set(str(gen_uuid))
+    uuid_entry = Entry(add_collection_frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(str(gen_uuid)))
+    uuid_entry.grid(column = 1, row = 1, pady = (5, 5))
+        
 
 def clear(frame_name):
     for widget in frame_name.winfo_children():

@@ -39,3 +39,12 @@ def collection_list():
     collection = conn.execute("SELECT * from collection")
     collectionList = list(collection)
     return collectionList
+
+def check_uuid(uuid):
+    conn = connection_init()
+    uuids = conn.execute("SELECT uuid FROM collection where uuid = ?", (uuid,))
+    uuids_list = list(uuids)
+    if len(uuids_list) == 0:
+        return False
+    else:
+        return True
