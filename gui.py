@@ -85,7 +85,7 @@ def scan(root):
     lblUUIDHeader.configure(text = "UUID: ")
     data_string = StringVar()
     data_string.set(uuid)
-    uuid_entry = Entry(frame, textvariable=data_string, bd = 0, state="readonly", width = len(uuid))
+    uuid_entry = Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(uuid))
     uuid_entry.grid(column = 1, row = 1, pady = (5, 5))
     
     for index, record_info in enumerate(record):
@@ -97,64 +97,82 @@ def scan(root):
                     h, m = divmod(m, 60)
                     data_string = StringVar()
                     data_string.set(f'{h:d}:{m:02d}:{s:02d}')
-                    column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", width = len(f'{h:d}:{m:02d}:{s:02d}')))
+                    column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(f'{h:d}:{m:02d}:{s:02d}')))
                     column[i].grid(column = i, row = 4, padx = 5, sticky='ew')
                 else:
                     data_string = StringVar()
                     data_string.set('------')
-                    column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", width = len('------')))
+                    column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len('------')))
                     column[i].grid(column = i, row = 4, padx = 5, sticky='ew')
             elif i == 5:
                 if t == 33.33:
                     data_string = StringVar()
                     data_string.set('33 1/3 RPM')
-                    column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", width = len(data_string.get())))
+                    column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(data_string.get())))
                     column[i].grid(column = i, row = 4, padx = 5, sticky='ew')
                 else:
                     data_string = StringVar()
                     data_string.set(t+'RPM')
-                    column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", width = len(data_string.get())))
+                    column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(data_string.get())))
                     column[i].grid(column = i, row = 4, padx = 5, sticky='ew')
             else:
                 data_string = StringVar()
                 data_string.set(t)
-                column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", width = len(str(t))))
+                column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(str(t))))
                 column[i].grid(column = i, row = 4, padx = 5, sticky='ew')
     
+    string = ''
     for index, item in enumerate(genres):
-        column = []
         for i, t in enumerate(genres[index]):
-            column.append(Label(frame, text = t))
-            if i == 1:
-                if t != "Y":
-                    column[0].configure(font = 'bold')
-            else:
-                column[i].grid(column = index, row = 7)
+            if i == 0:
+                if string == '':
+                    string = t
+                else:
+                    string = string + ', ' + t
+            
+    data_string = StringVar()
+    data_string.set(string)
+    genre_view = Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(string))
+    genre_view.grid(column = 0, row = 7, padx = 5, sticky='ew')
+
                 
     for index, item in enumerate(tracks):
         column = []
         for i, t in enumerate(tracks[index]):
             if i == 4:
                 song_artists = song_artist(int(t))
+                string = ''
                 for it, artist in enumerate(song_artists):
-                    if it > 0:
-                        string = column[i].cget("text")
-                        string = string + ", " + artist[0]
-                        column[i].config(text = string)
-                    else:
-                        column.append(Label(frame, text = artist[0]))
-                        column[i].grid(column = it + i, row = index + 12)
+                    for j, k in enumerate(song_artists[it]):
+                        if k:
+                            if j == 0:
+                                if string == '':
+                                    string = k
+                                else:
+                                    string = string + ', ' + k
+                
+                data_string = StringVar()
+                data_string.set(string)
+                column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(string)))
+                column[i].grid(column = i, row = index + 12, padx = 5, sticky='ew')
+            
             elif i == 2:
                 if t:
                     m, s = divmod(int(t), 60)
-                    column.append(Label(frame, text = f'{m:02d}:{s:02d}'))
-                    column[i].grid(column = i, row = index + 12)
+                    data_string = StringVar()
+                    data_string.set(f'{m:02d}:{s:02d}')
+                    column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(data_string.get())))
+                    column[i].grid(column = i, row = index + 12, padx = 5, sticky='ew')
                 else:
-                    column.append(Label(frame, text = '---'))
-                    column[i].grid(column = i, row = index + 12)
+                    data_string = StringVar()
+                    data_string.set('---')
+                    column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(str(t))))
+                    column[i].grid(column = i, row = index + 12, padx = 5, sticky='ew')
             else:
-                column.append(Label(frame, text = t))
-                column[i].grid(column = i, row = index + 12)
+                data_string = StringVar()
+                data_string.set(t)
+                column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(str(t))))
+                column[i].grid(column = i, row = index + 12, padx = 5, sticky='ew')
                 
 def show_collection(root):
     global collection_frame
