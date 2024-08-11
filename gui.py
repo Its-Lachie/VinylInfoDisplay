@@ -45,11 +45,11 @@ def label_gen(frame):
     lblNotesHeader = Label(frame, font = 'Calibri 14 bold', text = "Notes")
     lblNotesHeader.grid(column = 6, row = 3, padx = 15)
 
-    lblGenreTitle = Label(frame, font = 'Calibri 14 bold', text = "Genres")
+    lblGenreTitle = Label(frame, font = 'Calibri 20 bold', text = "Genres")
     lblGenreTitle.grid(column = 0, row = 6, padx = 15)
     
-    lblTrackHeader = Label(frame, font = 'Calibri 14 bold', text = "Tracks")
-    lblTrackHeader.grid(column = 0, row = 10, padx = 15)
+    lblTrackHeader = Label(frame, font = 'Calibri 20 bold', text = "Tracks")
+    lblTrackHeader.grid(column = 0, row = 10, pady = (5, 15))
     
     lblTrackNoHeader = Label(frame, font = 'Calibri 14 bold', text = "Track Number")
     lblTrackNoHeader.grid(column = 0, row = 11, padx = 15)
@@ -105,6 +105,11 @@ def scan(root):
                     data_string.set('------')
                     column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len('------')))
                     column[i].grid(column = i, row = 4, padx = 5, sticky='ew')
+            elif i == 4:
+                data_string = StringVar()
+                data_string.set(str(t)+'"')
+                column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(data_string.get())))
+                column[i].grid(column = i, row = 4, padx = 5, sticky='ew')
             elif i == 5:
                 if t == 33.33:
                     data_string = StringVar()
@@ -223,6 +228,51 @@ def add_to_collection():
              fg = "red", command=generate_uuid)
     btnGenUUID.grid(column=2, row=1, padx = 10)
     
+    #Album info
+    albumTitle_textVar = StringVar()
+    albumTitle_entry = Entry(add_collection_frame, textvariable=albumTitle_textVar, bd = 0, width = 50)
+    albumTitle_entry.grid(column = 0, row = 4, padx = 5)
+    
+    albumArtist_textVar = StringVar()
+    albumArtist_entry = Entry(add_collection_frame, textvariable=albumArtist_textVar, bd = 0, width = 50)
+    albumArtist_entry.grid(column = 1, row = 4, padx = 5)
+    
+    albumRuntime_textVar = StringVar()
+    albumRuntime_entry = Entry(add_collection_frame, textvariable=albumRuntime_textVar, bd = 0, width = 20)
+    albumRuntime_entry.grid(column = 2, row = 4, padx = 5)
+    
+    albumNoOfDiscs_textVar = StringVar()
+    albumNoOfDiscs_entry = Entry(add_collection_frame, textvariable=albumNoOfDiscs_textVar, bd = 0, width = 10)
+    albumNoOfDiscs_entry.grid(column = 3, row = 4, padx = 5)
+    
+    albumDiscSize_textVar = StringVar()
+    albumDiscSize_entry = Entry(add_collection_frame, textvariable=albumDiscSize_textVar, bd = 0, width = 10)
+    albumDiscSize_entry.grid(column = 4, row = 4, padx = 5)
+    
+    albumDiscSpeed_textVar = StringVar()
+    albumDiscSpeed_entry = Entry(add_collection_frame, textvariable=albumDiscSpeed_textVar, bd = 0, width = 10)
+    albumDiscSpeed_entry.grid(column = 5, row = 4, padx = 5)
+    
+    albumNotes_textVar = StringVar()
+    albumNotes_entry = Entry(add_collection_frame, textvariable=albumNotes_textVar, bd = 0, width = 50)
+    albumNotes_entry.grid(column = 6, row = 4, padx = 10)
+    
+    global genreColumn
+    global genreList
+    genreColumn = 0
+    genreList = []
+    btnAddGenre = Button(add_collection_frame, text = "Add Genre" ,
+             fg = "green", command=genre_add_entry)
+    btnAddGenre.grid(column=1, row=6, padx = 10)
+    
+    global tracksList
+    global trackrow
+    tracksList = []
+    trackrow = 12
+    btnAddTrack = Button(add_collection_frame, text = "Add Track" ,
+             fg = "green", command=track_add_entry)
+    btnAddTrack.grid(column=1, row=10, padx = 10)
+    
     
 def rescan(frame_name, root):
     clear(frame_name)
@@ -234,11 +284,37 @@ def generate_uuid():
         gen_uuid = uuid.uuid4()
         isInCollection = check_uuid(str(gen_uuid))
         
-    data_string = StringVar()
-    data_string.set(str(gen_uuid))
-    uuid_entry = Entry(add_collection_frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(str(gen_uuid)))
+    uuid_textVar = StringVar()
+    uuid_textVar.set(str(gen_uuid))
+    uuid_entry = Entry(add_collection_frame, textvariable=uuid_textVar, bd = 0, state="readonly", justify='center', width = len(str(gen_uuid)))
     uuid_entry.grid(column = 1, row = 1, pady = (5, 5))
-        
+
+def genre_add_entry():
+    global genreColumn
+    global genreList
+    genreList.append(Entry(add_collection_frame, bd = 0, width = 20))
+    genreList[genreColumn].grid(column = genreColumn, row = 7, pady = 5)
+    genreColumn = genreColumn + 1
+    
+def track_add_entry():
+    global tracksList
+    global trackrow
+    track_entry_list = []
+    for i in range(5):
+        if i == 1:
+            track_entry_list.append(Entry(add_collection_frame, bd = 0, width = 50))
+            track_entry_list[i].grid(column = i, row = trackrow, pady = 5)
+        elif i == 4:
+            track_entry_list.append(Entry(add_collection_frame, bd = 0, width = 100))
+            track_entry_list[i].grid(column = i, row = trackrow, pady = 5)
+        else:
+            track_entry_list.append(Entry(add_collection_frame, bd = 0, width = 10))
+            track_entry_list[i].grid(column = i, row = trackrow, pady = 5)
+    tracksList.append(track_entry_list)
+    print(len(tracksList))
+    trackrow += 1
+    
+
 
 def clear(frame_name):
     for widget in frame_name.winfo_children():
@@ -277,7 +353,6 @@ btnShowColl = Button(root_frame, text = "Show Collection" ,
              fg = "red", command=lambda:show_collection(root))
 # Set Button Grid
 btnShowColl.grid(column=1, row=0, padx = 10)
-
 
 # Execute Tkinter
 root.mainloop()
