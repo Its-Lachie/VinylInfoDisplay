@@ -18,8 +18,11 @@ def frame_gen(obj):
 
 def label_gen(frame):
     #Album labels
-    lblUUIDHeader = Label(frame, font = 'Calibri 20 bold', text = "UUID: ")
+    lblUUIDHeader = Label(frame, font = 'Calibri 20 bold', text = "UUID:")
     lblUUIDHeader.grid(column = 0, row = 1, pady = (5, 15))
+
+    lblnfcIDHeader = Label(frame, font = 'Calibri 20 bold', text = "nfcID:")
+    lblnfcIDHeader.grid(column = 5, row = 1, pady = (5, 15))
 
     lblAlbumInfo = Label(frame, font = 'Calibri 20 bold', text = "Album Info")
     lblAlbumInfo.grid(column = 0, row = 2, pady = (5, 15))
@@ -66,28 +69,33 @@ def label_gen(frame):
     lblTrackArtistHeader = Label(frame, font = 'Calibri 14 bold', text = "Artists")
     lblTrackArtistHeader.grid(column = 4, row = 11, padx = 15)
     
-    return lblUUIDHeader, lblAlbumInfo, lblTitleHeader, lblArtistHeader, lblRuntimeHeader, lblNoOfDiscsHeader, lblDiscSizeHeader, lblSpeedHeader, lblNotesHeader, lblGenreTitle, lblTrackHeader, lblTrackNoHeader, lblTrackNameHeader, lblTrackLenHeader, lblTrackSideHeader, lblTrackArtistHeader 
+    return lblUUIDHeader, lblnfcIDHeader, lblAlbumInfo, lblTitleHeader, lblArtistHeader, lblRuntimeHeader, lblNoOfDiscsHeader, lblDiscSizeHeader, lblSpeedHeader, lblNotesHeader, lblGenreTitle, lblTrackHeader, lblTrackNoHeader, lblTrackNameHeader, lblTrackLenHeader, lblTrackSideHeader, lblTrackArtistHeader 
 
 def scan(root):
-    global frame
-    frame = frame_gen(text)
-    text.window_create('1.0', window=frame)
-    frame.grid_rowconfigure(5, minsize=50)
-    frame.grid_rowconfigure(9, minsize=50)
-    lblUUIDHeader, lblAlbumInfo, lblTitleHeader, lblArtistHeader, lblRuntimeHeader, lblNoOfDiscsHeader, lblDiscSizeHeader, lblSpeedHeader, lblNotesHeader, lblGenreTitle, lblTrackHeader, lblTrackNoHeader, lblTrackNameHeader, lblTrackLenHeader, lblTrackSideHeader, lblTrackArtistHeader = label_gen(frame)
+    global scan_frame
+    scan_frame = frame_gen(text)
+    text.window_create('1.0', window=scan_frame)
+    scan_frame.grid_rowconfigure(5, minsize=50)
+    scan_frame.grid_rowconfigure(9, minsize=50)
+    lblUUIDHeader, lblnfcIDHeader, lblAlbumInfo, lblTitleHeader, lblArtistHeader, lblRuntimeHeader, lblNoOfDiscsHeader, lblDiscSizeHeader, lblSpeedHeader, lblNotesHeader, lblGenreTitle, lblTrackHeader, lblTrackNoHeader, lblTrackNameHeader, lblTrackLenHeader, lblTrackSideHeader, lblTrackArtistHeader = label_gen(scan_frame)
     
-    btnClear.config(command=lambda:clear(frame))
+    btnClear.config(command=lambda:clear(scan_frame))
     btnAddToColl.config(command='')
     btnShowColl.config(command='')
-    btnScan.config(command=lambda:rescan(frame, root))
+    btnScan.config(command=lambda:rescan(scan_frame, root))
     
-    uuid_found, record, genres, tracks = scanner()
+    uuid_found, record, genres, tracks, hexVal = scanner()
     
     lblUUIDHeader.configure(text = "UUID: ")
     data_string = StringVar()
     data_string.set(uuid_found)
-    uuid_entry = Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(uuid_found))
+    uuid_entry = Entry(scan_frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(uuid_found))
     uuid_entry.grid(column = 1, row = 1, pady = (5, 5))
+    
+    data_string = StringVar()
+    data_string.set(hexVal)
+    hexVal_entry = Entry(scan_frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(uuid_found))
+    hexVal_entry.grid(column = 6, row = 1, pady = (5, 5))
     
     for index, record_info in enumerate(record):
         column = []
@@ -98,33 +106,33 @@ def scan(root):
                     h, m = divmod(m, 60)
                     data_string = StringVar()
                     data_string.set(f'{h:d}:{m:02d}:{s:02d}')
-                    column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(f'{h:d}:{m:02d}:{s:02d}')))
+                    column.append(Entry(scan_frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(f'{h:d}:{m:02d}:{s:02d}')))
                     column[i].grid(column = i, row = 4, padx = 5, sticky='ew')
                 else:
                     data_string = StringVar()
                     data_string.set('------')
-                    column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len('------')))
+                    column.append(Entry(scan_frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len('------')))
                     column[i].grid(column = i, row = 4, padx = 5, sticky='ew')
             elif i == 4:
                 data_string = StringVar()
                 data_string.set(str(t)+'"')
-                column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(data_string.get())))
+                column.append(Entry(scan_frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(data_string.get())))
                 column[i].grid(column = i, row = 4, padx = 5, sticky='ew')
             elif i == 5:
                 if t == 33.33:
                     data_string = StringVar()
                     data_string.set('33 1/3 RPM')
-                    column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(data_string.get())))
+                    column.append(Entry(scan_frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(data_string.get())))
                     column[i].grid(column = i, row = 4, padx = 5, sticky='ew')
                 else:
                     data_string = StringVar()
                     data_string.set(t+'RPM')
-                    column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(data_string.get())))
+                    column.append(Entry(scan_frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(data_string.get())))
                     column[i].grid(column = i, row = 4, padx = 5, sticky='ew')
             else:
                 data_string = StringVar()
                 data_string.set(t)
-                column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(str(t))))
+                column.append(Entry(scan_frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(str(t))))
                 column[i].grid(column = i, row = 4, padx = 5, sticky='ew')
     
     string = ''
@@ -138,7 +146,7 @@ def scan(root):
             
     data_string = StringVar()
     data_string.set(string)
-    genre_view = Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(string))
+    genre_view = Entry(scan_frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(string))
     genre_view.grid(column = 0, row = 7, padx = 5, sticky='ew')
 
                 
@@ -159,7 +167,7 @@ def scan(root):
                 
                 data_string = StringVar()
                 data_string.set(string)
-                column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(string)))
+                column.append(Entry(scan_frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(string)))
                 column[i].grid(column = i, row = index + 12, padx = 5, sticky='ew')
             
             elif i == 2:
@@ -167,17 +175,17 @@ def scan(root):
                     m, s = divmod(int(t), 60)
                     data_string = StringVar()
                     data_string.set(f'{m:02d}:{s:02d}')
-                    column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(data_string.get())))
+                    column.append(Entry(scan_frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(data_string.get())))
                     column[i].grid(column = i, row = index + 12, padx = 5, sticky='ew')
                 else:
                     data_string = StringVar()
                     data_string.set('---')
-                    column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(str(t))))
+                    column.append(Entry(scan_frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(str(t))))
                     column[i].grid(column = i, row = index + 12, padx = 5, sticky='ew')
             else:
                 data_string = StringVar()
                 data_string.set(t)
-                column.append(Entry(frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(str(t))))
+                column.append(Entry(scan_frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(str(t))))
                 column[i].grid(column = i, row = index + 12, padx = 5, sticky='ew')
                 
 def show_collection(root):
@@ -218,15 +226,22 @@ def add_to_collection():
     add_collection_frame.grid_rowconfigure(5, minsize=50)
     add_collection_frame.grid_rowconfigure(9, minsize=50)
     text.window_create('1.0', window=add_collection_frame)
-    lblUUIDHeader, lblAlbumInfo, lblTitleHeader, lblArtistHeader, lblRuntimeHeader, lblNoOfDiscsHeader, lblDiscSizeHeader, lblSpeedHeader, lblNotesHeader, lblGenreTitle, lblTrackHeader, lblTrackNoHeader, lblTrackNameHeader, lblTrackLenHeader, lblTrackSideHeader, lblTrackArtistHeader = label_gen(add_collection_frame)
+    lblUUIDHeader, lblnfcIDHeader, lblAlbumInfo, lblTitleHeader, lblArtistHeader, lblRuntimeHeader, lblNoOfDiscsHeader, lblDiscSizeHeader, lblSpeedHeader, lblNotesHeader, lblGenreTitle, lblTrackHeader, lblTrackNoHeader, lblTrackNameHeader, lblTrackLenHeader, lblTrackSideHeader, lblTrackArtistHeader = label_gen(add_collection_frame)
     
     btnClear.config(command=lambda:clear(add_collection_frame))
     btnScan.config(command='')
     btnShowColl.config(command='')
     
+    btnSave.configure(text = "Save to Collection" ,
+             fg = "red")
+    
     btnGenUUID = Button(add_collection_frame, text = "Generate UUID" ,
              fg = "red", command=generate_uuid)
     btnGenUUID.grid(column=2, row=1, padx = 10)
+    
+    hexVal_textVar = StringVar()
+    hexVal_entry = Entry(add_collection_frame, textvariable=hexVal_textVar, bd = 0, width = 50)
+    hexVal_entry.grid(column = 6, row = 1, padx = 5, pady = (5, 5))
     
     #Album info
     albumTitle_textVar = StringVar()
@@ -311,7 +326,6 @@ def track_add_entry():
             track_entry_list.append(Entry(add_collection_frame, bd = 0, width = 10))
             track_entry_list[i].grid(column = i, row = trackrow, pady = 5)
     tracksList.append(track_entry_list)
-    print(len(tracksList))
     trackrow += 1
     
 
@@ -319,16 +333,21 @@ def track_add_entry():
 def clear(frame_name):
     for widget in frame_name.winfo_children():
        widget.destroy()
-       
-       frame_name.destroy()
-       
+    
+    btnSave.configure(text = "")
+    frame_name.destroy()
+        
     btnScan.configure(command=lambda:scan(root))
     btnShowColl.configure(command=lambda:show_collection(root))
     btnAddToColl.configure(command=add_to_collection)
 
 
 root_frame = frame_gen(root)
+root_frame.columnconfigure(7, weight=1)
 root_frame.pack(side="top", fill="both")
+
+btnSave = Button(root_frame, text = "")
+btnSave.grid(column=7, row=0, padx = (10, 0), sticky="e")
 
 # button widget with red color text inside
 btnClear = Button(root_frame, text = "Clear" ,

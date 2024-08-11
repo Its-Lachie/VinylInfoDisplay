@@ -44,4 +44,4 @@ def scanner():
         finally:
             GPIO.cleanup()
         break
-    return uuid, record, genres, tracks
+    return uuid, record, genres, tracks, hexVal
