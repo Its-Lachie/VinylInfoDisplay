@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter.scrolledtext import ScrolledText
-from nfc_check import scanner
+from nfc_check import scan_record, get_hexVal, change_hexVal
 from db_connect import song_artist, collection_list, check_uuid
 import uuid
 
@@ -82,9 +82,11 @@ def scan(root):
     btnClear.config(command=lambda:clear(scan_frame))
     btnAddToColl.config(command='')
     btnShowColl.config(command='')
+    btnRemoveFromColl.config(command='')
+    btnChangeNFC.config(command='')
     btnScan.config(command=lambda:rescan(scan_frame, root))
     
-    uuid_found, record, genres, tracks, hexVal = scanner()
+    uuid_found, record, genres, tracks, hexVal = scan_record()
     
     lblUUIDHeader.configure(text = "UUID: ")
     data_string = StringVar()
@@ -94,7 +96,7 @@ def scan(root):
     
     data_string = StringVar()
     data_string.set(hexVal)
-    hexVal_entry = Entry(scan_frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(uuid_found))
+    hexVal_entry = Entry(scan_frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(hexVal))
     hexVal_entry.grid(column = 6, row = 1, pady = (5, 5))
     
     for index, record_info in enumerate(record):
@@ -196,6 +198,8 @@ def show_collection(root):
     btnClear.config(command=lambda:clear(collection_frame))
     btnScan.config(command='')
     btnAddToColl.config(command='')
+    btnRemoveFromColl.config(command='')
+    btnChangeNFC.config(command='')
     
     collection = collection_list()
     for index, item in enumerate(collection):
@@ -230,7 +234,9 @@ def add_to_collection():
     
     btnClear.config(command=lambda:clear(add_collection_frame))
     btnScan.config(command='')
-    btnShowColl.config(command='')
+    btnAddToColl.config(command='')
+    btnRemoveFromColl.config(command='')
+    btnChangeNFC.config(command='')
     
     btnSave.configure(text = "Save to Collection" ,
              fg = "red")
@@ -288,6 +294,49 @@ def add_to_collection():
              fg = "green", command=track_add_entry)
     btnAddTrack.grid(column=1, row=10, padx = 10)
     
+def remove_from_collection():
+    global remove_from_collection_frame
+    remove_from_collection_frame = frame_gen(text)
+    text.window_create('1.0', window=remove_from_collection_frame)
+    
+    btnClear.config(command=lambda:clear(remove_from_collection_frame))
+    btnScan.config(command='')
+    btnAddToColl.config(command='')
+    btnRemoveFromColl.config(command='')
+    btnChangeNFC.config(command='')
+    
+def change_nfc_value():
+    global change_nfc_value_frame
+    change_nfc_value_frame = frame_gen(text)
+    text.window_create('1.0', window=change_nfc_value_frame)
+    
+    btnClear.config(command=lambda:clear(change_nfc_value_frame))
+    btnScan.config(command='')
+    btnAddToColl.config(command='')
+    btnRemoveFromColl.config(command='')
+    btnChangeNFC.config(command='')
+    
+    hexVal = get_hexVal()
+    
+    lblnfcIDHeader = Label(change_nfc_value_frame, font = 'Calibri 20 bold', text = "Current nfcID:")
+    lblnfcIDHeader.grid(column = 0, row = 1, pady = (10, 15), padx = (10,10))
+    
+    data_string = StringVar()
+    data_string.set(hexVal)
+    hexVal_RO_entry = Entry(change_nfc_value_frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(hexVal))
+    hexVal_RO_entry.grid(column = 1, row = 1, pady = (10, 15), padx = (0,10))
+    
+    lblnfcIDnewHeader = Label(change_nfc_value_frame, font = 'Calibri 20 bold', text = "New nfcID:")
+    lblnfcIDnewHeader.grid(column = 0, row = 2, padx = (10,0))
+    
+    hexVal_data_string = StringVar()
+    hexVal_entry = Entry(change_nfc_value_frame, textvariable=hexVal_data_string, bd = 0, width = 50)
+    hexVal_entry.grid(column = 1, row = 2, padx = (0,10))
+    
+    btnChangeVal = Button(change_nfc_value_frame, text = "Save nfcID" ,
+             fg = "green", command=lambda:save_new_nfcID(hexVal_entry.get()))
+    btnChangeVal.grid(column=1, row=3, padx = 10)
+    
     
 def rescan(frame_name, root):
     clear(frame_name)
@@ -327,8 +376,6 @@ def track_add_entry():
             track_entry_list[i].grid(column = i, row = trackrow, pady = 5)
     tracksList.append(track_entry_list)
     trackrow += 1
-    
-
 
 def clear(frame_name):
     for widget in frame_name.winfo_children():
@@ -340,38 +387,55 @@ def clear(frame_name):
     btnScan.configure(command=lambda:scan(root))
     btnShowColl.configure(command=lambda:show_collection(root))
     btnAddToColl.configure(command=add_to_collection)
+    btnRemoveFromColl.config(command=remove_from_collection)
+    btnChangeNFC.config(command=change_nfc_value)
+    btnClear.configure(command='')
+
+def save_new_nfcID(newHexVal):
+    change_hexVal(newHexVal)
 
 
 root_frame = frame_gen(root)
-root_frame.columnconfigure(7, weight=1)
+root_frame.columnconfigure(10, weight=1)
 root_frame.pack(side="top", fill="both")
 
 btnSave = Button(root_frame, text = "")
-btnSave.grid(column=7, row=0, padx = (10, 0), sticky="e")
+btnSave.grid(column=10, row=0, padx = (5, 0), sticky="e")
 
 # button widget with red color text inside
 btnClear = Button(root_frame, text = "Clear" ,
-             fg = "red")
+             fg = "red", command=change_nfc_value)
 # Set Button Grid
-btnClear.grid(column=3, row=0, padx = 10)
+btnClear.grid(column=9, row=0, padx = 5)
+
+btnChangeNFC = Button(root_frame, text = "Change NFC Value" ,
+             fg = "red", command=change_nfc_value)
+# Set Button Grid
+btnChangeNFC.grid(column=4, row=0, padx = 5)
+
+# button widget with red color text inside
+btnRemoveFromColl = Button(root_frame, text = "Remove from Collection" ,
+             fg = "red", command=remove_from_collection)
+# Set Button Grid
+btnRemoveFromColl.grid(column=3, row=0, padx = 5)
 
 # button widget with red color text inside
 btnAddToColl = Button(root_frame, text = "Add to Collection" ,
              fg = "red", command=add_to_collection)
 # Set Button Grid
-btnAddToColl.grid(column=2, row=0, padx = 10)
+btnAddToColl.grid(column=2, row=0, padx = 5)
  
 # button widget with red color text inside
-btnScan = Button(root_frame, text = "Scan NFC" ,
+btnScan = Button(root_frame, text = "Scan Record" ,
              fg = "red", command=lambda:scan(root))
 # Set Button Grid
-btnScan.grid(column=0, row=0, padx = (0,10))
+btnScan.grid(column=0, row=0, padx = (0,5))
 
 # button widget with red color text inside
 btnShowColl = Button(root_frame, text = "Show Collection" ,
              fg = "red", command=lambda:show_collection(root))
 # Set Button Grid
-btnShowColl.grid(column=1, row=0, padx = 10)
+btnShowColl.grid(column=1, row=0, padx = 5)
 
 # Execute Tkinter
 root.mainloop()
