@@ -4,6 +4,7 @@ from nfc_check import scan_record, get_hexVal, change_hexVal
 from db_connect import song_artist, collection_list, check_uuid
 import uuid
 
+# Base tkinter settings for display
 root = Tk()
 
 root.title("VinylInfoDisplay")
@@ -12,6 +13,7 @@ root.geometry('1900x900')
 text = ScrolledText(root, state='disable')
 text.pack(side = "bottom", fill='both', expand=True)
 
+# Generate the frame and labels
 def frame_gen(obj):
     frame = Frame(obj)
     return frame
@@ -71,7 +73,9 @@ def label_gen(frame):
     
     return lblUUIDHeader, lblnfcIDHeader, lblAlbumInfo, lblTitleHeader, lblArtistHeader, lblRuntimeHeader, lblNoOfDiscsHeader, lblDiscSizeHeader, lblSpeedHeader, lblNotesHeader, lblGenreTitle, lblTrackHeader, lblTrackNoHeader, lblTrackNameHeader, lblTrackLenHeader, lblTrackSideHeader, lblTrackArtistHeader 
 
+# Scan function
 def scan(root):
+    # Generate frame and labels
     global scan_frame
     scan_frame = frame_gen(text)
     text.window_create('1.0', window=scan_frame)
@@ -79,6 +83,7 @@ def scan(root):
     scan_frame.grid_rowconfigure(9, minsize=50)
     lblUUIDHeader, lblnfcIDHeader, lblAlbumInfo, lblTitleHeader, lblArtistHeader, lblRuntimeHeader, lblNoOfDiscsHeader, lblDiscSizeHeader, lblSpeedHeader, lblNotesHeader, lblGenreTitle, lblTrackHeader, lblTrackNoHeader, lblTrackNameHeader, lblTrackLenHeader, lblTrackSideHeader, lblTrackArtistHeader = label_gen(scan_frame)
     
+    # Clear buttons of functions as to not stack frames
     btnClear.config(command=lambda:clear(scan_frame))
     btnAddToColl.config(command='')
     btnShowColl.config(command='')
@@ -86,8 +91,10 @@ def scan(root):
     btnChangeNFC.config(command='')
     btnScan.config(command=lambda:rescan(scan_frame, root))
     
+    # Get record info from scanning
     uuid_found, record, genres, tracks, hexVal = scan_record()
     
+    # Set text on screen
     lblUUIDHeader.configure(text = "UUID: ")
     data_string = StringVar()
     data_string.set(uuid_found)
@@ -189,18 +196,22 @@ def scan(root):
                 data_string.set(t)
                 column.append(Entry(scan_frame, textvariable=data_string, bd = 0, state="readonly", justify='center', width = len(str(t))))
                 column[i].grid(column = i, row = index + 12, padx = 5, sticky='ew')
-                
+
+# Show full collection function                
 def show_collection(root):
+    # Frame Generation
     global collection_frame
     collection_frame = frame_gen(text)
     text.window_create('1.0', window=collection_frame)
     
+    # Clear button functions
     btnClear.config(command=lambda:clear(collection_frame))
     btnScan.config(command='')
     btnAddToColl.config(command='')
     btnRemoveFromColl.config(command='')
     btnChangeNFC.config(command='')
     
+    # Get record collection and change text to display them
     collection = collection_list()
     for index, item in enumerate(collection):
         column = []
@@ -223,8 +234,10 @@ def show_collection(root):
                 data_string.set(t)
                 column.append(Entry(collection_frame, textvariable=data_string, bd = 0, state="readonly", width = len(str(t))))
                 column[i].grid(column = i, row = index, padx = 5, sticky='ew')
-        
+
+# Adding record to collection (WIP)        
 def add_to_collection():
+    # Frame and label generation
     global add_collection_frame
     add_collection_frame = frame_gen(text)
     add_collection_frame.grid_rowconfigure(5, minsize=50)
@@ -232,12 +245,14 @@ def add_to_collection():
     text.window_create('1.0', window=add_collection_frame)
     lblUUIDHeader, lblnfcIDHeader, lblAlbumInfo, lblTitleHeader, lblArtistHeader, lblRuntimeHeader, lblNoOfDiscsHeader, lblDiscSizeHeader, lblSpeedHeader, lblNotesHeader, lblGenreTitle, lblTrackHeader, lblTrackNoHeader, lblTrackNameHeader, lblTrackLenHeader, lblTrackSideHeader, lblTrackArtistHeader = label_gen(add_collection_frame)
     
+    # Button function clearing
     btnClear.config(command=lambda:clear(add_collection_frame))
     btnScan.config(command='')
     btnAddToColl.config(command='')
     btnRemoveFromColl.config(command='')
     btnChangeNFC.config(command='')
     
+    # Save button generation
     btnSave.configure(text = "Save to Collection" ,
              fg = "red")
     
@@ -249,7 +264,7 @@ def add_to_collection():
     hexVal_entry = Entry(add_collection_frame, textvariable=hexVal_textVar, bd = 0, width = 50)
     hexVal_entry.grid(column = 6, row = 1, padx = 5, pady = (5, 5))
     
-    #Album info
+    # Album info
     albumTitle_textVar = StringVar()
     albumTitle_entry = Entry(add_collection_frame, textvariable=albumTitle_textVar, bd = 0, width = 50)
     albumTitle_entry.grid(column = 0, row = 4, padx = 5)
@@ -293,29 +308,36 @@ def add_to_collection():
     btnAddTrack = Button(add_collection_frame, text = "Add Track" ,
              fg = "green", command=track_add_entry)
     btnAddTrack.grid(column=1, row=10, padx = 10)
-    
+
+# Remove from Collection function (WIP)    
 def remove_from_collection():
+    # Frame generation
     global remove_from_collection_frame
     remove_from_collection_frame = frame_gen(text)
     text.window_create('1.0', window=remove_from_collection_frame)
     
+    # Button function clearing
     btnClear.config(command=lambda:clear(remove_from_collection_frame))
     btnScan.config(command='')
     btnAddToColl.config(command='')
     btnRemoveFromColl.config(command='')
     btnChangeNFC.config(command='')
-    
+
+# Change NFC Value Function    
 def change_nfc_value():
+    # Frame generation
     global change_nfc_value_frame
     change_nfc_value_frame = frame_gen(text)
     text.window_create('1.0', window=change_nfc_value_frame)
     
+    # Button function clearing
     btnClear.config(command=lambda:clear(change_nfc_value_frame))
     btnScan.config(command='')
     btnAddToColl.config(command='')
     btnRemoveFromColl.config(command='')
     btnChangeNFC.config(command='')
     
+    # GUI element creation
     hexVal = get_hexVal()
     
     lblnfcIDHeader = Label(change_nfc_value_frame, font = 'Calibri 20 bold', text = "Current nfcID:")
@@ -337,11 +359,12 @@ def change_nfc_value():
              fg = "green", command=lambda:save_new_nfcID(hexVal_entry.get()))
     btnChangeVal.grid(column=1, row=3, padx = 10)
     
-    
+# Rescan record NFC function    
 def rescan(frame_name, root):
     clear(frame_name)
     scan(root)
 
+# UUID Generation
 def generate_uuid():
     isInCollection = True
     while isInCollection:
@@ -353,13 +376,15 @@ def generate_uuid():
     uuid_entry = Entry(add_collection_frame, textvariable=uuid_textVar, bd = 0, state="readonly", justify='center', width = len(str(gen_uuid)))
     uuid_entry.grid(column = 1, row = 1, pady = (5, 5))
 
+# Genre addition
 def genre_add_entry():
     global genreColumn
     global genreList
     genreList.append(Entry(add_collection_frame, bd = 0, width = 20))
     genreList[genreColumn].grid(column = genreColumn, row = 7, pady = 5)
     genreColumn = genreColumn + 1
-    
+
+# Track addition
 def track_add_entry():
     global tracksList
     global trackrow
@@ -377,6 +402,7 @@ def track_add_entry():
     tracksList.append(track_entry_list)
     trackrow += 1
 
+# Clear frame function
 def clear(frame_name):
     for widget in frame_name.winfo_children():
        widget.destroy()
@@ -391,50 +417,41 @@ def clear(frame_name):
     btnChangeNFC.config(command=change_nfc_value)
     btnClear.configure(command='')
 
+# Save new NFC Value
 def save_new_nfcID(newHexVal):
     change_hexVal(newHexVal)
 
-
+# Main window frame generation
 root_frame = frame_gen(root)
 root_frame.columnconfigure(10, weight=1)
 root_frame.pack(side="top", fill="both")
 
+# Button generation
 btnSave = Button(root_frame, text = "")
 btnSave.grid(column=10, row=0, padx = (5, 0), sticky="e")
 
-# button widget with red color text inside
 btnClear = Button(root_frame, text = "Clear" ,
              fg = "red", command=change_nfc_value)
-# Set Button Grid
 btnClear.grid(column=9, row=0, padx = 5)
 
 btnChangeNFC = Button(root_frame, text = "Change NFC Value" ,
              fg = "red", command=change_nfc_value)
-# Set Button Grid
 btnChangeNFC.grid(column=4, row=0, padx = 5)
 
-# button widget with red color text inside
 btnRemoveFromColl = Button(root_frame, text = "Remove from Collection" ,
              fg = "red", command=remove_from_collection)
-# Set Button Grid
 btnRemoveFromColl.grid(column=3, row=0, padx = 5)
 
-# button widget with red color text inside
 btnAddToColl = Button(root_frame, text = "Add to Collection" ,
              fg = "red", command=add_to_collection)
-# Set Button Grid
 btnAddToColl.grid(column=2, row=0, padx = 5)
  
-# button widget with red color text inside
 btnScan = Button(root_frame, text = "Scan Record" ,
              fg = "red", command=lambda:scan(root))
-# Set Button Grid
 btnScan.grid(column=0, row=0, padx = (0,5))
 
-# button widget with red color text inside
 btnShowColl = Button(root_frame, text = "Show Collection" ,
              fg = "red", command=lambda:show_collection(root))
-# Set Button Grid
 btnShowColl.grid(column=1, row=0, padx = 5)
 
 # Execute Tkinter
