@@ -1,10 +1,12 @@
 from fractions import Fraction
 import sqlite3
 
+# Initialise Connection
 def connection_init():
     conn = sqlite3.connect('database/collection.db')
     return conn
 
+# Check the database for the record based on UUID
 def database_check(hexVal):
     conn = connection_init()
     
@@ -28,18 +30,21 @@ def database_check(hexVal):
     conn.close()
     return uuid, record_list, record_genres, tracks
 
+# Get list of artists for a song
 def song_artist(trackID):
     conn = connection_init()
     song_artists = conn.execute("SELECT artist, main, featured, remixer from track_artist WHERE trackID = ?", (trackID,))
     artists = list(song_artists)
     return artists
 
+# Get the full list of records from the collection
 def collection_list():
     conn = connection_init()
     collection = conn.execute("SELECT * from collection")
     collectionList = list(collection)
     return collectionList
 
+# Check the UUID to ensure no duplicates
 def check_uuid(uuid):
     conn = connection_init()
     uuids = conn.execute("SELECT uuid FROM collection where uuid = ?", (uuid,))
